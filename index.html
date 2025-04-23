@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Project QA Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        :root {
+            --accent-teal: #4DB6AC;
+            --dark-bg: #121212;
+            --text-gray: #CFD8DC;
+            --light-gray: #263238;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* Page Loader */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 18, 18, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-gray);
+            border-top: 5px solid var(--accent-teal);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--accent-teal), #0288D1);
+            color: var(--dark-bg);
+            padding: 1rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+        .header-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 8px var(--accent-teal));
+        }
+        .header-text {
+            flex: 1;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        header p {
+            font-size: 0.7rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        .header-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .header-link, .contact-button {
+            background: var(--dark-bg);
+            color: var(--accent-teal);
+            border: 2px solid var(--accent-teal);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .header-link:hover, .contact-button:hover {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Project Management */
+        .project-management {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-button {
+            background: var(--light-gray);
+            color: var(--text-gray);
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dropdown-button:hover {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.3);
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--light-gray);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            animation: slideDown 0.3s ease-out;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-menu li {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .dropdown-menu li:hover {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+        }
+        .project-button {
+            background: linear-gradient(135deg, var(--accent-teal), #0288D1);
+            color: var(--dark-bg);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 0 0.5rem;
+        }
+        .project-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+        .project-button:disabled {
+            background: var(--light-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .no-projects {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 2rem 0;
+            color: var(--text-gray);
+            background: var(--light-gray);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        /* Add Project Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 600px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            border: 2px solid var(--accent-teal);
+            box-shadow: 0 0 20px rgba(77, 182, 172, 0.5);
+        }
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--accent-teal);
+            transition: var(--transition);
+        }
+        .close-button:hover {
+            color: var(--text-gray);
+            transform: rotate(90deg);
+        }
+        .modal-content h2 {
+            font-size: 1.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 1.5rem;
+        }
+        .modal-content label {
+            display: block;
+            margin: 0.5rem 0 0.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--text-gray);
+            background: var(--dark-bg);
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .modal-content select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+        .modal-content input:focus, .modal-content select:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 5px rgba(77, 182, 172, 0.3);
+        }
+        .modal-content .existing-links {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .modal-content .existing-links h3 {
+            font-size: 1.1rem;
+            color: var(--accent-teal);
+            margin-bottom: 0.5rem;
+        }
+        .modal-content .existing-links ul {
+            list-style: none;
+        }
+        .modal-content .existing-links li {
+            font-size: 0.9rem;
+            margin: 0.25rem 0;
+            word-break: break-all;
+        }
+        .modal-content .existing-links li::before {
+            content: "🔗 ";
+        }
+        .modal-content button {
+            background: linear-gradient(135deg, var(--accent-teal), #0288D1);
+            color: var(--dark-bg);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+        .modal-content .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .modal-content .generated-key {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        /* Project Team Section */
+        .project-team {
+            margin: 2rem 0;
+        }
+        .project-team h2 {
+            font-size: 1.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 1rem;
+        }
+        .project-team-list {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .project-team-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .project-team-list th, .project-team-list td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .project-team-list th {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            font-weight: 600;
+        }
+        .project-team-list td {
+            font-weight: 400;
+        }
+
+        /* Status Summary */
+        .status-summary {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .status-card {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 150px;
+            flex: 1 1 calc(25% - 1.5rem);
+            transition: var(--transition);
+            border: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .status-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(77, 182, 172, 0.3);
+        }
+        .status-card i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-teal);
+        }
+        .status-card h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        .status-card p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+        }
+
+        /* Progress */
+        .progress-container {
+            width: 100%;
+            background: var(--light-gray);
+            border-radius: 25px;
+            height: 12px;
+            margin: 2rem 0;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-teal), #0288D1);
+            border-radius: 25px;
+            width: 0;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            font-weight: 400;
+        }
+
+        /* Overall Progress */
+        .overall-progress {
+            margin◆: 2rem 0;
+        }
+        .overall-progress h2 {
+            font-size: 1.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 1rem;
+        }
+        .project-summary {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            border: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .project-summary table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .project-summary th, .project-summary td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .project-summary th {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            font-weight: 600;
+        }
+        .project-summary td {
+            font-weight: 400;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background: var(--light-gray);
+            border-radius: 50px;
+            padding: 0.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            border: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .tab-button {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 50px;
+            color: var(--text-gray);
+            flex: 1;
+            text-align: center;
+            font-weight: 500;
+        }
+        .tab-button:hover {
+            color: var(--accent-teal);
+            background: rgba(77, 182, 172, 0.1);
+        }
+        .tab-button.active {
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+        .tab-button i {
+            margin-right: 0.5rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem auto;
+            border: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-content h2 {
+            font-size: 1.75rem;
+            color: var(--accent-teal);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        .tab-content h2 i {
+            margin-right: 0.75rem;
+        }
+
+        /* Document Actions */
+        .doc-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .doc-actions .doc-link {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            background: var(--dark-bg);
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--text-gray);
+            word-break: break-all;
+        }
+        .doc-button {
+            background: linear-gradient(135deg, var(--accent-teal), #0288D1);
+            color: var(--dark-bg);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        .doc-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 10px rgba(77, 182, 172, 0.5);
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            margin-bottom: 1.5rem;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .checkbox-group label:hover {
+            background: rgba(77, 182, 172, 0.1);
+        }
+        .checkbox-group input[type="checkbox"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--text-gray);
+            border-radius: 6px;
+            margin-right: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .checkbox-group input[type="checkbox"]:checked {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+        }
+        .checkbox-group input[type="checkbox"]:disabled {
+            background: #666;
+            border-color: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .checkbox-group input[type="checkbox"]::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+            color: var(--dark-bg);
+            display: none;
+        }
+        .checkbox-group input[type="checkbox"]:checked::after {
+            display: block;
+        }
+        .verification-badge {
+            margin-left: auto;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            background: var(--text-gray);
+            color: var(--dark-bg);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        .checkbox-group input[type="checkbox"]:checked ~ .verification-badge {
+            background: var(--accent-teal);
+            box-shadow: 0 0 5px rgba(77, 182, 172, 0.3);
+        }
+
+        /* Messages */
+        .message {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--accent-teal);
+        }
+        .success {
+            background: rgba(77, 182, 172, 0.1);
+            color: var(--accent-teal);
+        }
+        .error {
+            background: rgba(77, 182, 172, 0.1);
+            color: var(--accent-teal);
+        }
+
+        /* Document Viewer Modal */
+        #preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #preview-modal .modal-content {
+            width: 80%;
+            height: 80%;
+            background: var(--light-gray);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--accent-teal);
+            box-shadow: 0 0 20px rgba(77, 182, 172, 0.5);
+        }
+        #preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--accent-teal);
+            transition: var(--transition);
+        }
+        .close-button:hover {
+            color: var(--text-gray);
+            transform: rotate(90deg);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--light-gray);
+            color: var(--text-gray);
+            text-align: center;
+            padding: 1.5rem 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(77, 182, 172, 0.2);
+        }
+        footer p {
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .header-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .status-card {
+                flex: 1 1 calc(50% - 1.5rem);
+            }
+            .tabs {
+                flex-wrap: wrap;
+            }
+            .tab-button {
+                flex: 1 0 calc(50% - 0.5rem);
+                margin: 0.25rem;
+            }
+            #preview-modal .modal-content {
+                width: 90%;
+                height: 90%;
+            }
+        }
+        @media (max-width: 480px) {
+            .header-logo {
+                width: 60px;
+                height: 60px;
+            }
+            header h1 {
+                font-size: 1rem;
+            }
+            header p {
+                font-size: 0.6rem;
+            }
+            .status-card {
+                flex: 1 1 100%;
+            }
+            .tab-button {
+                flex: 1 0 100%;
+            }
+            .doc-actions .doc-link {
+                min-width: 100%;
+            }
+            .project-button {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <img src="images/qa-hub-logo.png" alt="QA Hub Logo" class="header-logo">
+            <div class="header-text">
+                <h1>Multi-Project QA Hub</h1>
+                <p>Centralized QA documentation with in-app previews</p>
+            </div>
+            <div class="header-links">
+                <a href="https://intersmartqa.github.io/QATabs/" class="header-link"><i class="fas fa-table"></i> QA Tabs</a>
+                <a href="mailto:abhiram@intersmart.in" class="contact-button"><i class="fas fa-envelope"></i> Contact: abhiram@intersmart.in</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Project Management -->
+        <div class="project-management">
+            <div class="custom-dropdown">
+                <button class="dropdown-button" id="dropdown-button"><i class="fas fa-chevron-down"></i> Select a Project</button>
+                <ul class="dropdown-menu" id="dropdown-menu"></ul>
+            </div>
+            <button class="project-button" onclick="openAddProjectModal()">Add New Project</button>
+            <button class="project-button" onclick="deleteProject()" id="delete-project" style="display: none;">Delete Selected Project</button>
+            <div id="no-projects" class="no-projects">No projects available. Add a new project to begin.</div>
+        </div>
+
+        <!-- Add Project Modal -->
+        <div id="add-project-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeAddProjectModal()">×</span>
+                <h2>Add New Project</h2>
+                <label for="project-name">Project Name</label>
+                <input type="text" id="project-name" placeholder="Enter project name">
+                <label for="project-org">Organization (Optional)</label>
+                <input type="text" id="project-org" placeholder="Enter organization">
+                <label for="qa-name">QA Name</label>
+                <input type="text" id="qa-name" placeholder="Enter QA name">
+                <label for="qa-doc-url">QA Documentation URL (Google Docs)</label>
+                <input type="text" id="qa-doc-url" placeholder="Enter Google Docs URL">
+                <label for="test-doc-url">Test Documentation URL (Google Docs)</label>
+                <input type="text" id="test-doc-url" placeholder="Enter Google Docs URL">
+                <label for="test-cases-url">Test Cases URL (Google Sheets)</label>
+                <input type="text" id="test-cases-url" placeholder="Enter Google Sheets URL">
+                <div class="existing-links">
+                    <h3>Previously Added Links</h3>
+                    <ul id="existing-links-list"></ul>
+                </div>
+                <div class="generated-key" id="generated-key" style="display: none;">
+                    <strong>Generated Verification Key:</strong> <span id="key-value"></span>
+                </div>
+                <button id="add-project-btn" onclick="addProjectFromModal()">Add Project</button>
+                <div id="modal-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Project Team Section -->
+        <div class="project-team" id="project-team" style="display: none;">
+            <h2>Project Team</h2>
+            <div class="project-team-list">
+                <table id="project-team-table">
+                    <thead>
+                        <tr>
+                            <th>Detail</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Status Summary -->
+        <div class="status-summary" id="status-summary" style="display: none;">
+            <div class="status-card">
+                <i class="fas fa-file-alt"></i>
+                <h3>QA Docs</h3>
+                <p id="qa-docs-count">0/2</p>
+            </div>
+            <div class="status-card">
+                <i class="fas fa-clipboard-check"></i>
+                <h3>Test Docs</h3>
+                <p id="test-docs-count">0/2</p>
+            </div>
+            <div class="status-card">
+                <i class="fas fa-tasks"></i>
+                <h3>Test Cases</h3>
+                <p id="test-cases-count">0/2</p>
+            </div>
+            <div class="status-card">
+                <i class="fas fa-percentage"></i>
+                <h3>Completion</h3>
+                <p id="completion-percent">0%</p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container" style="display: none;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text" style="display: none;">Verification progress: 0% complete</div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabs" style="display: none;">
+            <button class="tab-button active" data-tab="qa-documentation"><i class="fas fa-file-alt"></i> QA Documentation</button>
+            <button class="tab-button" data-tab="test-documentation"><i class="fas fa-clipboard-check"></i> Test Documentation</button>
+            <button class="tab-button" data-tab="test-cases"><i class="fas fa-tasks"></i> Test Cases</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="qa-documentation" class="tab-content active">
+            <h2><i class="fas fa-file-alt"></i> <span id="qa-doc-title">QA Documentation</span></h2>
+            <div class="doc-actions">
+                <div class="doc-link" id="qa-documentation-url">No URL provided</div>
+                <button class="doc-button" onclick="viewArtifact('qa-documentation')"><i class="fas fa-eye"></i> View</button>
+                <button class="doc-button" onclick="previewArtifact('qa-documentation')"><i class="fas fa-file-alt"></i> Preview</button>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="qa-documentation-qa-lead" onchange="verifyCheckbox(this, 'qa-documentation', 'qaLead')">
+                    Verified by QA Lead
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="qa-documentation-qa-lead-message" class="message"></div>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="qa-documentation-project-manager" onchange="verifyCheckbox(this, 'qa-documentation', 'projectManager')">
+                    Verified by Project Manager
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="qa-documentation-project-manager-message" class="message"></div>
+            </div>
+        </div>
+
+        <div id="test-documentation" class="tab-content">
+            <h2><i class="fas fa-clipboard-check"></i> <span id="test-doc-title">Test Documentation</span></h2>
+            <div class="doc-actions">
+                <div class="doc-link" id="test-documentation-url">No URL provided</div>
+                <button class="doc-button" onclick="viewArtifact('test-documentation')"><i class="fas fa-eye"></i> View</button>
+                <button class="doc-button" onclick="previewArtifact('test-documentation')"><i class="fas fa-file-alt"></i> Preview</button>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="test-documentation-qa-lead" onchange="verifyCheckbox(this, 'test-documentation', 'qaLead')">
+                    Verified by QA Lead
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="test-documentation-qa-lead-message" class="message"></div>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="test-documentation-project-manager" onchange="verifyCheckbox(this, 'test-documentation', 'projectManager')">
+                    Verified by Project Manager
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="test-documentation-project-manager-message" class="message"></div>
+            </div>
+        </div>
+
+        <div id="test-cases" class="tab-content">
+            <h2><i class="fas fa-tasks"></i> <span id="test-cases-title">Test Cases</span></h2>
+            <div class="doc-actions">
+                <div class="doc-link" id="test-cases-url">No URL provided</div>
+                <button class="doc-button" onclick="viewArtifact('test-cases')"><i class="fas fa-eye"></i> View</button>
+                <button class="doc-button" onclick="previewArtifact('test-cases')"><i class="fas fa-file-alt"></i> Preview</button>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="test-cases-qa-lead" onchange="verifyCheckbox(this, 'test-cases', 'qaLead')">
+                    Verified by QA Lead
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="test-cases-qa-lead-message" class="message"></div>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="test-cases-project-manager" onchange="verifyCheckbox(this, 'test-cases', 'projectManager')">
+                    Verified by Project Manager
+                    <span class="verification-badge">Pending</span>
+                </label>
+                <div id="test-cases-project-manager-message" class="message"></div>
+            </div>
+        </div>
+
+        <!-- Overall Progress -->
+        <div class="overall-progress">
+            <h2>Overall Progress</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="overall-progress-bar"></div>
+            </div>
+            <div class="progress-text" id="overall-progress-text">Overall verification progress: 0% complete</div>
+            <div class="project-summary">
+                <table id="project-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Organization</th>
+                            <th>QA Name</th>
+                            <th>Completion</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">×</span>
+            <iframe id="preview-iframe" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Multi-Project QA Hub ensures quality standards across projects, tracks progress, and mitigates risks. Verification by QA Leads and Project Managers is essential for compliance and project success.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script type="module">
+        // Firebase Initialization
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4majXz_bsshd7bse2dqXEpOn_jCTl3-g",
+  authDomain: "wiprowebstore.firebaseapp.com",
+  projectId: "wiprowebstore",
+  storageBucket: "wiprowebstore.firebasestorage.app",
+  messagingSenderId: "93257374678",
+  appId: "1:93257374678:web:b2eeb44fd6a4c4152a6277"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentProjectId = null;
+        const checkboxStates = {
+            'qa-documentation-qaLead': false,
+            'qa-documentation-projectManager': false,
+            'test-documentation-qaLead': false,
+            'test-documentation-projectManager': false,
+            'test-cases-qaLead': false,
+            'test-cases-projectManager': false
+        };
+        const artifactUrls = {
+            'qa-documentation': '',
+            'test-documentation': '',
+            'test-cases': ''
+        };
+        let allArtifactLinks = [];
+
+        // Generate Random Key
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let key = '';
+            for (let i = 0; i < 12; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key;
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loader = document.getElementById('page-loader');
+            try {
+                await loadProjects();
+                await loadAllArtifactLinks();
+                updateOverallProgress();
+            } catch (error) {
+                console.error('Initialization error:', error);
+            } finally {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+
+            // Tab Switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
+                    button.classList.add('active');
+                });
+            });
+
+            // Dropdown Toggle
+            const dropdownButton = document.getElementById('dropdown-button');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            dropdownButton.addEventListener('click', () => {
+                dropdownMenu.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+        });
+
+        // Load All Artifact Links
+        async function loadAllArtifactLinks() {
+            allArtifactLinks = [];
+            const projectsSnapshot = await getDocs(collection(db, 'projects'));
+            for (const projectDoc of projectsSnapshot.docs) {
+                const verificationsSnapshot = await getDocs(collection(db, 'projects', projectDoc.id, 'verifications'));
+                verificationsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.artifactUrl) {
+                        allArtifactLinks.push(data.artifactUrl);
+                    }
+                });
+            }
+        }
+
+        // Open Add Project Modal
+        window.openAddProjectModal = async () => {
+            try {
+                await loadAllArtifactLinks();
+                const modal = document.getElementById('add-project-modal');
+                const existingLinksList = document.getElementById('existing-links-list');
+                existingLinksList.innerHTML = '';
+                if (allArtifactLinks.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No links added yet.';
+                    existingLinksList.appendChild(li);
+                } else {
+                    allArtifactLinks.forEach(link => {
+                        const li = document.createElement('li');
+                        li.textContent = link;
+                        existingLinksList.appendChild(li);
+                    });
+                }
+                // Generate and display key
+                const keyDisplay = document.getElementById('generated-key');
+                const keyValue = document.getElementById('key-value');
+                const newKey = generateKey();
+                keyValue.textContent = newKey;
+                keyDisplay.style.display = 'block';
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                alert('Failed to open Add Project modal. Check console for details.');
+            }
+        };
+
+        // Close Add Project Modal
+        window.closeAddProjectModal = () => {
+            const modal = document.getElementById('add-project-modal');
+            const errorMessage = document.getElementById('modal-error');
+            const keyDisplay = document.getElementById('generated-key');
+            document.getElementById('project-name').value = '';
+            document.getElementById('project-org').value = '';
+            document.getElementById('qa-name').value = '';
+            document.getElementById('qa-doc-url').value = '';
+            document.getElementById('test-doc-url').value = '';
+            document.getElementById('test-cases-url').value = '';
+            errorMessage.style.display = 'none';
+            keyDisplay.style.display = 'none';
+            modal.style.display = 'none';
+        };
+
+        // Add Project from Modal
+        window.addProjectFromModal = async () => {
+            const addButton = document.getElementById('add-project-btn');
+            const errorMessage = document.getElementById('modal-error');
+            const name = document.getElementById('project-name').value.trim();
+            const organization = document.getElementById('project-org').value.trim() || '';
+            const qaName = document.getElementById('qa-name').value.trim();
+            const qaDocUrl = document.getElementById('qa-doc-url').value.trim();
+            const testDocUrl = document.getElementById('test-doc-url').value.trim();
+            const testCasesUrl = document.getElementById('test-cases-url').value.trim();
+            const verificationKey = document.getElementById('key-value').textContent;
+
+            // Reset error message
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            // Basic validation
+            if (!name) {
+                errorMessage.textContent = 'Project name is required.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            if (!qaName) {
+                errorMessage.textContent = 'QA name is required.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            // Simplified URL validation
+            const urlPattern = /^https:\/\/.+/;
+            if (!qaDocUrl || !urlPattern.test(qaDocUrl)) {
+                errorMessage.textContent = 'Please provide a valid URL for QA Documentation (e.g., https://docs.google.com/...).';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            if (!testDocUrl || !urlPattern.test(testDocUrl)) {
+                errorMessage.textContent = 'Please provide a valid URL for Test Documentation (e.g., https://docs.google.com/...).';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            if (!testCasesUrl || !urlPattern.test(testCasesUrl)) {
+                errorMessage.textContent = 'Please provide a valid URL for Test Cases (e.g., https://docs.google.com/...).';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            addButton.disabled = true;
+            addButton.textContent = 'Adding...';
+
+            try {
+                const projectRef = doc(collection(db, 'projects'));
+                await setDoc(projectRef, {
+                    name,
+                    organization,
+                    qaName,
+                    verificationKey,
+                    createdAt: new Date().toISOString()
+                });
+
+                const tabs = [
+                    { id: 'qa-documentation', url: qaDocUrl },
+                    { id: 'test-documentation', url: testDocUrl },
+                    { id: 'test-cases', url: testCasesUrl }
+                ];
+
+                for (const tab of tabs) {
+                    await setDoc(doc(db, 'projects', projectRef.id, 'verifications', tab.id), {
+                        qaLead: 'Pending',
+                        projectManager: 'Pending',
+                        artifactUrl: tab.url
+                    });
+                }
+
+                await loadProjects();
+                await loadProject(projectRef.id);
+                document.getElementById('dropdown-button').innerHTML = `<i class="fas fa-chevron-down"></i> ${name}`;
+                closeAddProjectModal();
+            } catch (error) {
+                console.error('Error adding project:', error);
+                errorMessage.textContent = 'Failed to add project: ' + (error.message || 'Unknown error');
+                errorMessage.style.display = 'block';
+            } finally {
+                addButton.disabled = false;
+                addButton.textContent = 'Add Project';
+            }
+        };
+
+        // Load Projects
+        async function loadProjects() {
+            try {
+                const dropdownMenu = document.getElementById('dropdown-menu');
+                const noProjects = document.getElementById('no-projects');
+                dropdownMenu.innerHTML = '';
+                const projectsSnapshot = await getDocs(collection(db, 'projects'));
+                const projects = [];
+                projectsSnapshot.forEach(doc => {
+                    projects.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (projects.length === 0) {
+                    noProjects.style.display = 'block';
+                    document.getElementById('status-summary').style.display = 'none';
+                    document.getElementById('progress-container').style.display = 'none';
+                    document.getElementById('progress-text').style.display = 'none';
+                    document.getElementById('tabs').style.display = 'none';
+                    document.getElementById('delete-project').style.display = 'none';
+                    document.getElementById('project-team').style.display = 'none';
+                } else {
+                    noProjects.style.display = 'none';
+                    projects.forEach(project => {
+                        const li = document.createElement('li');
+                        li.textContent = project.name;
+                        li.setAttribute('data-id', project.id);
+                        li.addEventListener('click', () => {
+                            loadProject(project.id);
+                            document.getElementById('dropdown-button').innerHTML = `<i class="fas fa-chevron-down"></i> ${project.name}`;
+                            dropdownMenu.classList.remove('show');
+                        });
+                        dropdownMenu.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                alert('Failed to load projects. Check console for details.');
+            }
+        }
+
+        // Delete Project
+        window.deleteProject = async () => {
+            if (!currentProjectId) return;
+            if (!confirm('Are you sure you want to delete this project?')) return;
+            try {
+                const verificationsRef = collection(db, 'projects', currentProjectId, 'verifications');
+                const verificationsSnapshot = await getDocs(verificationsRef);
+                for (const docSnap of verificationsSnapshot.docs) {
+                    await deleteDoc(doc(db, 'projects', currentProjectId, 'verifications', docSnap.id));
+                }
+                await deleteDoc(doc(db, 'projects', currentProjectId));
+                currentProjectId = null;
+                await loadProjects();
+                document.getElementById('dropdown-button').innerHTML = '<i class="fas fa-chevron-down"></i> Select a Project';
+                resetUI();
+                updateOverallProgress();
+            } catch (error) {
+                console.error('Error deleting project:', error);
+                alert('Failed to delete project. Check console for details.');
+            }
+        };
+
+        // Load Project
+        window.loadProject = async (projectId) => {
+            try {
+                currentProjectId = projectId;
+                const projectData = projectId ? (await getDoc(doc(db, 'projects', projectId))).data() : null;
+                const noProjects = document.getElementById('no-projects');
+                const statusSummary = document.getElementById('status-summary');
+                const progressContainer = document.getElementById('progress-container');
+                const progressText = document.getElementById('progress-text');
+                const tabs = document.getElementById('tabs');
+                const deleteButton = document.getElementById('delete-project');
+                const projectTeamSection = document.getElementById('project-team');
+
+                if (!projectId) {
+                    noProjects.style.display = 'block';
+                    statusSummary.style.display = 'none';
+                    progressContainer.style.display = 'none';
+                    progressText.style.display = 'none';
+                    tabs.style.display = 'none';
+                    deleteButton.style.display = 'none';
+                    projectTeamSection.style.display = 'none';
+                    resetUI();
+                    return;
+                }
+
+                noProjects.style.display = 'none';
+                statusSummary.style.display = 'flex';
+                progressContainer.style.display = 'block';
+                progressText.style.display = 'block';
+                tabs.style.display = 'flex';
+                deleteButton.style.display = 'inline-block';
+                projectTeamSection.style.display = 'block';
+
+                // Update Tab Titles
+                document.getElementById('qa-doc-title').textContent = `${projectData.name} QA Documentation`;
+                document.getElementById('test-doc-title').textContent = `${projectData.name} Test Documentation`;
+                document.getElementById('test-cases-title').textContent = `${projectData.name} Test Cases`;
+
+                // Load Verification Statuses and Project Team
+                await loadVerificationStatuses(projectId);
+                await loadProjectTeam(projectId);
+                updateProjectProgress();
+            } catch (error) {
+                console.error('Error loading project:', error);
+                alert('Failed to load project. Check console for details.');
+            }
+        };
+
+        // Load Project Team
+        async function loadProjectTeam(projectId) {
+            try {
+                const projectData = (await getDoc(doc(db, 'projects', projectId))).data();
+                const tableBody = document.querySelector('#project-team-table tbody');
+                tableBody.innerHTML = '';
+
+                const details = [
+                    { detail: 'Project Name', value: projectData.name },
+                    { detail: 'Organization', value: projectData.organization || 'N/A' },
+                    { detail: 'QA Name', value: projectData.qaName }
+                ];
+
+                for (const { detail, value } of details) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${detail}</td>
+                        <td>${value}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error('Error loading project team:', error);
+                alert('Failed to load project team. Check console for details.');
+            }
+        }
+
+        // Load Verification Statuses
+        async function loadVerificationStatuses(projectId) {
+            try {
+                const tabs = ['qa-documentation', 'test-documentation', 'test-cases'];
+                for (const tabId of tabs) {
+                    const docRef = doc(db, 'projects', projectId, 'verifications', tabId);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const qaLeadCheckbox = document.getElementById(`${tabId}-qa-lead`);
+                        const pmCheckbox = document.getElementById(`${tabId}-project-manager`);
+                        const urlDisplay = document.getElementById(`${tabId}-url`);
+                        const qaLeadBadge = qaLeadCheckbox.parentElement.querySelector('.verification-badge');
+                        const pmBadge = pmCheckbox.parentElement.querySelector('.verification-badge');
+                        const qaLeadMessage = document.getElementById(`${tabId}-qa-lead-message`);
+                        const pmMessage = document.getElementById(`${tabId}-project-manager-message`);
+
+                        checkboxStates[`${tabId}-qaLead`] = data.qaLead === 'Verified';
+                        checkboxStates[`${tabId}-projectManager`] = data.projectManager === 'Verified';
+                        artifactUrls[tabId] = data.artifactUrl || '';
+
+                        qaLeadCheckbox.checked = data.qaLead === 'Verified';
+                        qaLeadCheckbox.disabled = data.qaLead === 'Verified';
+                        pmCheckbox.checked = data.projectManager === 'Verified';
+                        pmCheckbox.disabled = data.projectManager === 'Verified';
+                        urlDisplay.textContent = data.artifactUrl || 'No URL provided';
+
+                        qaLeadBadge.textContent = data.qaLead;
+                        qaLeadBadge.style.backgroundColor = data.qaLead === 'Verified' ? 'var(--accent-teal)' : 'var(--text-gray)';
+                        pmBadge.textContent = data.projectManager;
+                        pmBadge.style.backgroundColor = data.projectManager === 'Verified' ? 'var(--accent-teal)' : 'var(--text-gray)';
+
+                        qaLeadMessage.style.display = data.qaLead === 'Verified' ? 'block' : 'none';
+                        if (data.qaLead === 'Verified') {
+                            qaLeadMessage.textContent = 'Verification successful!';
+                            qaLeadMessage.className = 'message success';
+                        }
+                        pmMessage.style.display = data.projectManager === 'Verified' ? 'block' : 'none';
+                        if (data.projectManager === 'Verified') {
+                            pmMessage.textContent = 'Verification successful!';
+                            pmMessage.className = 'message success';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading verification statuses:', error);
+                alert('Failed to load verification statuses. Check console for details.');
+            }
+        }
+
+        // Verify Checkbox
+        window.verifyCheckbox = async (checkbox, tabId, role) => {
+            const id = `${tabId}-${role}`;
+            const messageDiv = document.getElementById(`${tabId}-${role === 'qaLead' ? 'qa-lead' : 'project-manager'}-message`);
+            const badge = checkbox.parentElement.querySelector('.verification-badge');
+            const projectData = (await getDoc(doc(db, 'projects', currentProjectId))).data();
+            const correctKey = projectData.verificationKey;
+
+            if (checkbox.checked && !checkbox.disabled) {
+                const userKey = prompt('Enter project verification key:');
+                if (userKey === correctKey) {
+                    try {
+                        await setDoc(doc(db, 'projects', currentProjectId, 'verifications', tabId), {
+                            [role]: 'Verified'
+                        }, { merge: true });
+                        checkboxStates[id] = true;
+                        checkbox.disabled = true;
+                        messageDiv.textContent = 'Verification successful!';
+                        messageDiv.className = 'message success';
+                        messageDiv.style.display = 'block';
+                        badge.textContent = 'Verified';
+                        badge.style.backgroundColor = 'var(--accent-teal)';
+                        updateProjectProgress();
+                        updateOverallProgress();
+                    } catch (error) {
+                        console.error('Verification error:', error);
+                        checkbox.checked = false;
+                        checkboxStates[id] = false;
+                        messageDiv.textContent = 'Verification failed.';
+                        messageDiv.className = 'message error';
+                        messageDiv.style.display = 'block';
+                    }
+                } else {
+                    checkbox.checked = false;
+                    checkboxStates[id] = false;
+                    messageDiv.textContent = 'Incorrect key.';
+                    messageDiv.className = 'message error';
+                    messageDiv.style.display = 'block';
+                }
+            } else if (!checkbox.checked && !checkbox.disabled) {
+                try {
+                    await setDoc(doc(db, 'projects', currentProjectId, 'verifications', tabId), {
+                        [role]: 'Pending'
+                    }, { merge: true });
+                    checkboxStates[id] = false;
+                    messageDiv.style.display = 'none';
+                    badge.textContent = 'Pending';
+                    badge.style.backgroundColor = 'var(--text-gray)';
+                    updateProjectProgress();
+                    updateOverallProgress();
+                } catch (error) {
+                    console.error('Error reverting verification:', error);
+                    messageDiv.textContent = 'Failed to update.';
+                    messageDiv.className = 'message error';
+                    messageDiv.style.display = 'block';
+                }
+            }
+        };
+
+        // View Artifact
+        window.viewArtifact = (tabId) => {
+            const url = artifactUrls[tabId];
+            if (!url) {
+                alert('No URL provided for this artifact.');
+                return;
+            }
+            window.open(url, '_blank');
+        };
+
+        // Preview Artifact
+        window.previewArtifact = (tabId) => {
+            const url = artifactUrls[tabId];
+            if (!url || !url.match(/^(https:\/\/docs\.google\.com\/(document|spreadsheets)\/d\/[a-zA-Z0-9_-]+)/)) {
+                alert('No valid Google Docs or Sheets URL provided.');
+                return;
+            }
+            const modal = document.getElementById('preview-modal');
+            const iframe = document.getElementById('preview-iframe');
+            iframe.src = url.replace(/\/(edit|view).*$/, '/preview');
+            modal.style.display = 'flex';
+        };
+
+        // Close Modal
+        window.closeModal = () => {
+            const modal = document.getElementById('preview-modal');
+            const iframe = document.getElementById('preview-iframe');
+            iframe.src = '';
+            modal.style.display = 'none';
+        };
+
+        // Update Project Progress
+        window.updateProjectProgress = () => {
+            if (!currentProjectId) return;
+            const totalCheckboxes = Object.keys(checkboxStates).length;
+            let verifiedCount = 0;
+            for (const key in checkboxStates) {
+                if (checkboxStates[key]) verifiedCount++;
+            }
+            const percentComplete = Math.round((verifiedCount / totalCheckboxes) * 100);
+            document.getElementById('progress-bar').style.width = `${percentComplete}%`;
+            document.getElementById('progress-text').textContent = `Verification progress: ${percentComplete}% complete`;
+            document.getElementById('completion-percent').textContent = `${percentComplete}%`;
+
+            const qaDocVerified = (checkboxStates['qa-documentation-qaLead'] ? 1 : 0) + (checkboxStates['qa-documentation-projectManager'] ? 1 : 0);
+            const testDocVerified = (checkboxStates['test-documentation-qaLead'] ? 1 : 0) + (checkboxStates['test-documentation-projectManager'] ? 1 : 0);
+            const casesVerified = (checkboxStates['test-cases-qaLead'] ? 1 : 0) + (checkboxStates['test-cases-projectManager'] ? 1 : 0);
+
+            document.getElementById('qa-docs-count').textContent = `${qaDocVerified}/2`;
+            document.getElementById('test-docs-count').textContent = `${testDocVerified}/2`;
+            document.getElementById('test-cases-count').textContent = `${casesVerified}/2`;
+
+            const progressBar = document.getElementById('progress-bar');
+            if (percentComplete < 30) progressBar.style.background = 'linear-gradient(90deg, var(--accent-teal), #0288D1)';
+            else if (percentComplete < 70) progressBar.style.background = 'linear-gradient(90deg, #0288D1, var(--accent-teal))';
+            else progressBar.style.background = 'linear-gradient(90deg, var(--accent-teal), #0288D1)';
+        };
+
+        // Update Overall Progress
+        async function updateOverallProgress() {
+            try {
+                const projectsSnapshot = await getDocs(collection(db, 'projects'));
+                const tableBody = document.querySelector('#project-summary-table tbody');
+                tableBody.innerHTML = '';
+                let totalPercent = 0;
+                let projectCount = 0;
+
+                for (const projectDoc of projectsSnapshot.docs) {
+                    const project = { id: projectDoc.id, ...projectDoc.data() };
+                    let verifiedCount = 0;
+                    const verificationsSnapshot = await getDocs(collection(db, 'projects', project.id, 'verifications'));
+                    verificationsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.qaLead === 'Verified') verifiedCount++;
+                        if (data.projectManager === 'Verified') verifiedCount++;
+                    });
+                    const percentComplete = Math.round((verifiedCount / 6) * 100);
+                    totalPercent += percentComplete;
+                    projectCount++;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${project.name}</td>
+                        <td>${project.organization || 'N/A'}</td>
+                        <td>${project.qaName}</td>
+                        <td>${percentComplete}%</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+
+                const overallPercent = projectCount ? Math.round(totalPercent / projectCount) : 0;
+                document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
+                document.getElementById('overall-progress-text').textContent = `Overall verification progress: ${overallPercent}% complete`;
+            } catch (error) {
+                console.error('Error updating overall progress:', error);
+                alert('Failed to update overall progress. Check console for details.');
+            }
+        }
+
+        // Reset UI
+        function resetUI() {
+            for (const tabId of ['qa-documentation', 'test-documentation', 'test-cases']) {
+                const qaLeadCheckbox = document.getElementById(`${tabId}-qa-lead`);
+                const pmCheckbox = document.getElementById(`${tabId}-project-manager`);
+                const urlDisplay = document.getElementById(`${tabId}-url`);
+                const qaLeadBadge = qaLeadCheckbox.parentElement.querySelector('.verification-badge');
+                const pmBadge = pmCheckbox.parentElement.querySelector('.verification-badge');
+                const qaLeadMessage = document.getElementById(`${tabId}-qa-lead-message`);
+                const pmMessage = document.getElementById(`${tabId}-project-manager-message`);
+
+                qaLeadCheckbox.checked = false;
+                qaLeadCheckbox.disabled = false;
+                pmCheckbox.checked = false;
+                pmCheckbox.disabled = false;
+                urlDisplay.textContent = 'No URL provided';
+                qaLeadBadge.textContent = 'Pending';
+                pmBadge.textContent = 'Pending';
+                qaLeadBadge.style.backgroundColor = 'var(--text-gray)';
+                pmBadge.style.backgroundColor = 'var(--text-gray)';
+                qaLeadMessage.style.display = 'none';
+                pmMessage.style.display = 'none';
+
+                checkboxStates[`${tabId}-qaLead`] = false;
+                checkboxStates[`${tabId}-projectManager`] = false;
+                artifactUrls[tabId] = '';
+            }
+            document.getElementById('qa-doc-title').textContent = 'QA Documentation';
+            document.getElementById('test-doc-title').textContent = 'Test Documentation';
+            document.getElementById('test-cases-title').textContent = 'Test Cases';
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('progress-text').textContent = 'Verification progress: 0% complete';
+            document.getElementById('completion-percent').textContent = '0%';
+            document.getElementById('qa-docs-count').textContent = '0/2';
+            document.getElementById('test-docs-count').textContent = '0/2';
+            document.getElementById('test-cases-count').textContent = '0/2';
+        }
+    </script>
+</body>
+</html>
